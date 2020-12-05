@@ -45,7 +45,7 @@ namespace ElectionResults.Core.Repositories
             var localities = await dbSet.OrderBy(l => l.Name).ToListAsync();
             if (ballotId.HasValue)
             {
-                var ids = await _dbContext.Turnouts.Where(c => c.BallotId == ballotId.Value)
+                var ids = await _dbContext.Turnouts.Where(c => c.BallotId == ballotId.Value && c.TotalVotes > 0)
                     .Select(c => c.LocalityId).ToListAsync();
                 return localities.Where(l => ids.Any(i => i == l.LocalityId)).ToList();
             }
@@ -59,7 +59,7 @@ namespace ElectionResults.Core.Repositories
                 DateTimeOffset.Now.AddMinutes(MemoryCache.Countries.Minutes));
             if (ballotId.HasValue)
             {
-                var ids = await _dbContext.Turnouts.Where(c => c.BallotId == ballotId.Value)
+                var ids = await _dbContext.Turnouts.Where(c => c.BallotId == ballotId.Value && c.TotalVotes > 0)
                     .Select(c => c.CountryId).Distinct().ToListAsync();
                 return countries.Where(l => ids.Any(i => i == l.Id)).ToList();
             }
